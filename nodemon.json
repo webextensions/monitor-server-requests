@@ -1,0 +1,15 @@
+{
+    "verbose": true,
+    "watch": [
+        "./cli.js",
+        "./index.js",
+        "./logging/"
+    ],
+    "ext": "env js json mjs ts",
+    "ignoreRoot": [
+        ".git"
+    ],
+    "ignore": [
+        "./node_modules/"
+    ]
+}
