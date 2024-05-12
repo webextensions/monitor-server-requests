@@ -17,7 +17,7 @@ const { logInDetail } = require('./logging/logInDetail.js');
 const logger = noteDown;
 noteDown.option('showLogLine', false);
 
-app.use((req, res, next) => { // eslint-disable-line no-unused-vars
+app.use((req, res, next) => {
     logInDetail(
         req,
         {
