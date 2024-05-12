@@ -14,7 +14,7 @@
         "lodash": "^4.17.21",
         "note-down": "^1.0.2"
     },
-    "description": "Launch a simple HTTP server and monitor requests received",
+    "description": "Launch a simple HTTP server and monitor/log the requests received",
     "devDependencies": {
         "eslint": "=8.57.0",
         "eslint-config-ironplate": "^0.10.1",

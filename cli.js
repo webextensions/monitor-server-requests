@@ -1,5 +1,8 @@
+#!/usr/bin/env node
+
 const _ = require('lodash');
 const express = require('express');
+const serveIndex = require('serve-index');
 
 const app = express();
 
@@ -23,21 +26,31 @@ app.use((req, res, next) => { // eslint-disable-line no-unused-vars
             includeIps: true
         }
     );
-    return res.send('Hello World!');
+    return next();
+});
+
+const cwd = process.cwd();
+
+logger.verbose('Serving files from: ' + cwd);
+app.use(express.static(cwd));
+app.use(serveIndex(cwd, { icons: true }));
+
+app.use((req, res, next) => { // eslint-disable-line no-unused-vars
+    return res.status(404).send('404: Page not found');
 });
 
 let portFromConfig = parseInt(process.env.PORT);
 if (1 <= portFromConfig && portFromConfig <= 65535) {
     // do nothing
 } else {
-    portFromConfig = 3000;
+    portFromConfig = 8080;
 }
 
 (async () => {
     let portToUse;
     if (process.env.PORT_DYNAMIC === 'yes') {
         portToUse = await getPort({
-            port: getPort.portNumbers(portFromConfig, 65535)
+            port: getPort.makeRange(portFromConfig, 65535)
         });
     } else {
         portToUse = portFromConfig;
