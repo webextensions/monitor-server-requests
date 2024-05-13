@@ -44,5 +44,5 @@
         "start:port-dynamic": "PORT_DYNAMIC=yes nodemon ./cli.js",
         "test": "npm run lint"
     },
-    "version": "0.1.0"
+    "version": "0.2.0"
 }
