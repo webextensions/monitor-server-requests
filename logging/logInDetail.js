@@ -38,38 +38,33 @@ const getRequestDetails  = function (
         requestDetails['ips'] = ips;
     }
 
-    const query = JSON.stringify(req.query);
+    const query = req.query;
     requestDetails['query'] = query;
+    const queryAsString = JSON.stringify(query);
+    requestDetails['queryAsString'] = queryAsString;
 
-    const headersAsString = JSON.stringify(req.headers);
-    requestDetails['headers'] = headersAsString;
+    const headers = req.headers;
+    requestDetails['headers'] = headers;
+    const headersAsString = JSON.stringify(headers);
+    requestDetails['headersAsString'] = headersAsString;
 
     if (includeCookies) {
-        let cookiesAsString;
-        try {
-            cookiesAsString = JSON.stringify(req.cookies);
-        } catch (err) {
-            cookiesAsString = String(req.cookies);
-        }
-        requestDetails['cookies'] = cookiesAsString;
+        const cookies = req.cookies;
+        requestDetails['cookies'] = cookies;
+        const cookiesAsString = JSON.stringify(cookies);
+        requestDetails['cookiesAsString'] = cookiesAsString;
     }
     if (includeSignedCookies) {
-        let signedCookiesAsString;
-        try {
-            signedCookiesAsString = JSON.stringify(req.signedCookies);
-        } catch (err) {
-            signedCookiesAsString = String(req.signedCookies);
-        }
-        requestDetails['signedCookies'] = signedCookiesAsString;
+        const signedCookies = req.signedCookies;
+        requestDetails['signedCookies'] = signedCookies;
+        const signedCookiesAsString = JSON.stringify(signedCookies);
+        requestDetails['signedCookiesAsString'] = signedCookiesAsString;
     }
 
-    let bodyAsString;
-    try {
-        bodyAsString = JSON.stringify(req.body);
-    } catch (err) {
-        bodyAsString = String(req.body);
-    }
-    requestDetails['body'] = bodyAsString;
+    const body = req.body;
+    requestDetails['body'] = body;
+    const bodyAsString = JSON.stringify(body);
+    requestDetails['bodyAsString'] = bodyAsString;
 
     return requestDetails;
 };
@@ -79,7 +74,8 @@ const logInDetail = function (
     {
         includeCookies = false,
         includeSignedCookies = false,
-        includeIps = false
+        includeIps = false,
+        optimizeFor = 'balanced'
     } = {}
 ) {
     const requestDetails = getRequestDetails(
@@ -91,8 +87,17 @@ const logInDetail = function (
         }
     );
 
+    const jsonStringifyAndAlign = function (json) {
+        try {
+            return JSON.stringify(json, null, 4).replace(/\n/g, '\n       ');
+        } catch (err) {
+            return String(json);
+        }
+    };
+
     logger.verbose('');
     logger.verbose('>>>>');
+
     logger.verbose('    => Time              - ' + requestDetails['localTime'] + ' (UTC: ' + requestDetails['utcTimestamp'] + ')');
     logger.info('    => Request URL       - ' + requestDetails['fullUrl']);
     logger.verbose('    => req.method        - ' + requestDetails['method']);
@@ -102,18 +107,40 @@ const logInDetail = function (
         logger.verbose('    => req.ips           - ' + requestDetails['ips']);
     }
 
-    logger.verbose('    => req.query         - ' + requestDetails['query']);
-    logger.verbose('    => req.headers       - ' + requestDetails['headers']);
+    if (optimizeFor === 'reading') {
+        logger.verbose('    => req.query         - ' + jsonStringifyAndAlign(requestDetails['query']));
+    } else {
+        logger.verbose('    => req.query         - ' + requestDetails['queryAsString']);
+    }
+
+    if (optimizeFor === 'reading') {
+        logger.verbose('    => req.headers       - ' + jsonStringifyAndAlign(requestDetails['headers']));
+    } else {
+        logger.verbose('    => req.headers       - ' + requestDetails['headersAsString']);
+    }
 
     if (includeCookies) {
-        logger.verbose('    => req.cookies       - ' + requestDetails['cookies']);
+        if (optimizeFor === 'reading') {
+            logger.verbose('    => req.cookies       - ' + jsonStringifyAndAlign(requestDetails['cookies']));
+        } else {
+            logger.verbose('    => req.cookies       - ' + requestDetails['cookiesAsString']);
+        }
     }
 
     if (includeSignedCookies) {
-        logger.verbose('    => req.signedCookies - ' + requestDetails['signedCookies']);
+        if (optimizeFor === 'reading') {
+            logger.verbose('    => req.signedCookies - ' + jsonStringifyAndAlign(requestDetails['signedCookies']));
+        } else {
+            logger.verbose('    => req.signedCookies - ' + requestDetails['signedCookiesAsString']);
+        }
     }
 
-    logger.verbose('    => req.body          - ' + requestDetails['body']);
+    if (optimizeFor === 'reading' || optimizeFor === 'balanced') {
+        logger.verbose('    => req.body          - ' + jsonStringifyAndAlign(requestDetails['body']));
+    } else {
+        logger.verbose('    => req.body          - ' + requestDetails['bodyAsString']);
+    }
+
     logger.verbose('<<<<');
 
     return requestDetails;
