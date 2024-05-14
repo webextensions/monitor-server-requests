@@ -14,7 +14,8 @@
         "get-port": "=5.1.1",
         "local-ip-addresses-and-hostnames": "^0.2.0",
         "lodash": "^4.17.21",
-        "note-down": "^1.0.2"
+        "note-down": "^1.0.2",
+        "serve-index": "^1.9.1"
     },
     "description": "Launch a simple HTTP server and monitor/log the requests received",
     "devDependencies": {
