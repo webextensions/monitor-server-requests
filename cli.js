@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+const readline = require('node:readline');
+
 const { program } = require('commander');
 
 const _ = require('lodash');
@@ -7,11 +9,11 @@ const express = require('express');
 const serveIndex = require('serve-index');
 const cookieParser = require('cookie-parser');
 
+const tcpPortUsed = require('tcp-port-used');
+
 const networkDelay = require('express-network-delay');
 
 const app = express();
-
-const getPort = require('get-port');
 
 const libLocalIpAddressesAndHostnames = require('local-ip-addresses-and-hostnames');
 
@@ -48,6 +50,8 @@ const options = program.opts();
 
 const logger = noteDown;
 noteDown.option('showLogLine', false);
+
+const chalk = noteDown.chalk;
 
 app.use(cookieParser());
 
@@ -102,7 +106,7 @@ if (options.disableStatic) {
 } else {
     const cwd = process.cwd();
 
-    logger.verbose('Serving files from: ' + cwd);
+    logger.info('Serving files from: ' + chalk.reset(chalk.bold(cwd)));
     app.use(express.static(cwd));
 
     // https://github.com/expressjs/serve-index/issues/70
@@ -152,11 +156,25 @@ if (1 <= portFromConfig && portFromConfig <= 65535) {
 (async () => {
     let portToUse;
     if (options.portDynamic) {
+        const {
+            default: getPort,
+            portNumbers
+        } = await import('get-port');
         portToUse = await getPort({
-            port: getPort.makeRange(portFromConfig, 65535)
+            port: portNumbers(portFromConfig, 65535)
         });
     } else {
         portToUse = portFromConfig;
+    }
+
+    const isPortInUse = await tcpPortUsed.check(portToUse);
+    if (isPortInUse) {
+        logger.error(`Port ${portToUse} is already in use.`);
+        logger.verbose(`In such cases, we recommend launching ${packageName} with ${chalk.bold('--port-dynamic')} parameter.`);
+        logger.verbose(`Exiting...`);
+        process.exit(1);
+    } else {
+        logger.info('Starting server on port ' + portToUse);
     }
 
     app.listen(portToUse, () => {
@@ -171,14 +189,40 @@ if (1 <= portFromConfig && portFromConfig <= 65535) {
 
         if (localhostPaths.length) {
             if (localhostPaths.length === 1) {
-                logger.verbose('This server can be accessed from the following path:');
+                logger.info('This server can be accessed from the following path:');
             } else {
-                logger.verbose('This server can be accessed from any of the following paths:');
+                logger.info('This server can be accessed from any of the following paths:');
             }
 
             localhostPaths.forEach(function (localhostPath) {
                 logger.verbose('\t' + 'http://' + localhostPath + ':' + portToUse + '/');
             });
         }
+
+        logger.info('Press Ctrl+C to stop the server');
+        logger.info('Type `cls` or `clear` and press enter to clear the terminal screen');
     });
 })();
+
+const readlineInterface = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+readlineInterface.on('line', (input) => {
+    switch (input.trim()) {
+        case 'clear':
+        case 'cls':
+            // Note: There is a `console.clear()` method as well, but, it doesn't seem to follow a predictable behavior
+            // in some cases when tested in terminal. Haven't tested the behavior in debug mode and probably
+            // `console.clear()` might work better inside Node.js/Chrome DevTools and we may want to use both the
+            // approaches together.
+            process.stdout.write('\u001Bc'); // Clear the terminal screen
+            break;
+    }
+});
+
+readlineInterface.on('SIGINT', () => {
+    logger.error(`${packageName} stopped ... Exiting`);
+    process.exit(0);
+});
