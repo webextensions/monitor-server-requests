@@ -35,14 +35,15 @@ program
 const DEFAULT_PORT = 8080;
 
 program
-    .option('-p, --port <number>',       'Port number to be used (eg: 3000, 4430, 8000, 8080 etc) ;',    DEFAULT_PORT)
-    .option('-d, --port-dynamic',        'Use dynamic port number ;',                                    false)
-    .option('--disable-static',          'Do not serve static files ;',                                  false)
-    .option('-s, --status <number>',     'Status code for unmatched requests (eg: 200, 404, 500 etc) ;', 404)
-    .option('--delay-min <number>',      'Minimum delay in milliseconds ;',                              0)
-    .option('--delay-max <number>',      'Maximum delay in milliseconds ;',                              0)
-    .option('--abort-randomly <number>', 'Abort randomly (Probability between 0 to 1) ;',                0)
-    .option('--optimize-for <purpose>',  'Optimize for (size, reading, balanced) ;',                     'balanced');
+    .option('-p, --port <number>',       'Port number to be used (eg: 3000, 4430, 8000, 8080, etc) ;',      DEFAULT_PORT)
+    .option('-d, --port-dynamic',        'Use dynamic port number ;',                                       false)
+    .option('--disable-static',          'Do not serve static files ;',                                     false)
+    .option('-s, --status <number>',     'Status code for unmatched requests (eg: 200, 404, 500, etc) ;',   404)
+    .option('-r, --response <content>',  'Response for unmatched requests (eg: "ok", "{\\"a\\":1}" etc) ;', null)
+    .option('--delay-min <number>',      'Minimum delay in milliseconds ;',                                 0)
+    .option('--delay-max <number>',      'Maximum delay in milliseconds ;',                                 0)
+    .option('--abort-randomly <number>', 'Abort randomly (Probability between 0 to 1) ;',                   0)
+    .option('--optimize-for <purpose>',  'Optimize for (size, reading, balanced) ;',                        'balanced');
 
 program.parse();
 
@@ -134,14 +135,18 @@ if (options.disableStatic) {
         statusCode = 404;
     }
 
+    const responseFromConfig = options.response;
+    let content = responseFromConfig;
+    if (!content) {
+        content = JSON.stringify({ status: statusCode }, null, 4) + '\n';
+    }
+
     app.all('*', (req, res, next) => { // eslint-disable-line no-unused-vars
         return (
             res
                 .setHeader('Content-Type', 'application/json')
                 .status(statusCode)
-                .send(
-                    JSON.stringify({ status: statusCode }, null, 4) + '\n'
-                )
+                .send(content)
         );
     });
 }
