@@ -78,6 +78,9 @@ const logInDetail = function (
         optimizeFor = 'balanced'
     } = {}
 ) {
+    const loggerVerbose = logger.verbose || logger.trace || logger.log;
+    const loggerInfo = logger.info || logger.log;
+
     const requestDetails = getRequestDetails(
         req,
         {
@@ -95,53 +98,53 @@ const logInDetail = function (
         }
     };
 
-    logger.verbose('');
-    logger.verbose('<<<<');
+    loggerVerbose('');
+    loggerVerbose('<<<<');
 
-    logger.verbose(        '    => Time              - ' + requestDetails['localTime'] + ' (UTC: ' + requestDetails['utcTimestamp'] + ')');
-    logger.info(           '    => Request URL       - ' + requestDetails['fullUrl']);
-    logger.verbose(        '    => req.method        - ' + requestDetails['method']);
-    logger.verbose(        '    => req.ip            - ' + requestDetails['ip']);
+    loggerVerbose(        '    => Time              - ' + requestDetails['localTime'] + ' (UTC: ' + requestDetails['utcTimestamp'] + ')');
+    loggerInfo(           '    => Request URL       - ' + requestDetails['fullUrl']);
+    loggerVerbose(        '    => req.method        - ' + requestDetails['method']);
+    loggerVerbose(        '    => req.ip            - ' + requestDetails['ip']);
 
     if (includeIps) {
-        logger.verbose(    '    => req.ips           - ' + requestDetails['ips']);
+        loggerVerbose(    '    => req.ips           - ' + requestDetails['ips']);
     }
 
     if (optimizeFor === 'reading') {
-        logger.verbose(    '    => req.query         - ' + jsonStringifyAndAlign(requestDetails['query']));
+        loggerVerbose(    '    => req.query         - ' + jsonStringifyAndAlign(requestDetails['query']));
     } else {
-        logger.verbose(    '    => req.query         - ' + requestDetails['queryAsString']);
+        loggerVerbose(    '    => req.query         - ' + requestDetails['queryAsString']);
     }
 
     if (optimizeFor === 'reading') {
-        logger.verbose(    '    => req.headers       - ' + jsonStringifyAndAlign(requestDetails['headers']));
+        loggerVerbose(    '    => req.headers       - ' + jsonStringifyAndAlign(requestDetails['headers']));
     } else {
-        logger.verbose(    '    => req.headers       - ' + requestDetails['headersAsString']);
+        loggerVerbose(    '    => req.headers       - ' + requestDetails['headersAsString']);
     }
 
     if (includeCookies) {
         if (optimizeFor === 'reading') {
-            logger.verbose('    => req.cookies       - ' + jsonStringifyAndAlign(requestDetails['cookies']));
+            loggerVerbose('    => req.cookies       - ' + jsonStringifyAndAlign(requestDetails['cookies']));
         } else {
-            logger.verbose('    => req.cookies       - ' + requestDetails['cookiesAsString']);
+            loggerVerbose('    => req.cookies       - ' + requestDetails['cookiesAsString']);
         }
     }
 
     if (includeSignedCookies) {
         if (optimizeFor === 'reading') {
-            logger.verbose('    => req.signedCookies - ' + jsonStringifyAndAlign(requestDetails['signedCookies']));
+            loggerVerbose('    => req.signedCookies - ' + jsonStringifyAndAlign(requestDetails['signedCookies']));
         } else {
-            logger.verbose('    => req.signedCookies - ' + requestDetails['signedCookiesAsString']);
+            loggerVerbose('    => req.signedCookies - ' + requestDetails['signedCookiesAsString']);
         }
     }
 
     if (optimizeFor === 'reading' || optimizeFor === 'balanced') {
-        logger.verbose(    '    => req.body          - ' + jsonStringifyAndAlign(requestDetails['body']));
+        loggerVerbose(    '    => req.body          - ' + jsonStringifyAndAlign(requestDetails['body']));
     } else {
-        logger.verbose(    '    => req.body          - ' + requestDetails['bodyAsString']);
+        loggerVerbose(    '    => req.body          - ' + requestDetails['bodyAsString']);
     }
 
-    logger.verbose('>>>>');
+    loggerVerbose('>>>>');
 
     return requestDetails;
 };
