@@ -78,8 +78,8 @@ const logInDetail = function (
         optimizeFor = 'balanced'
     } = {}
 ) {
-    const loggerVerbose = logger.verbose || logger.trace || logger.log;
-    const loggerInfo = logger.info || logger.log;
+    const loggerVerbose = logger.verbose?.bind(logger) || logger.trace?.bind(logger) || logger.log?.bind(logger) || logger.info?.bind(logger);
+    const loggerInfo = logger.info?.bind(logger) || logger.log?.bind(logger);
 
     const requestDetails = getRequestDetails(
         req,
