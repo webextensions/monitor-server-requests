@@ -98,25 +98,25 @@ const logInDetail = function (
     logger.verbose('');
     logger.verbose('<<<<');
 
-    logger.verbose('    => Time              - ' + requestDetails['localTime'] + ' (UTC: ' + requestDetails['utcTimestamp'] + ')');
-    logger.info('    => Request URL       - ' + requestDetails['fullUrl']);
-    logger.verbose('    => req.method        - ' + requestDetails['method']);
-    logger.verbose('    => req.ip            - ' + requestDetails['ip']);
+    logger.verbose(        '    => Time              - ' + requestDetails['localTime'] + ' (UTC: ' + requestDetails['utcTimestamp'] + ')');
+    logger.info(           '    => Request URL       - ' + requestDetails['fullUrl']);
+    logger.verbose(        '    => req.method        - ' + requestDetails['method']);
+    logger.verbose(        '    => req.ip            - ' + requestDetails['ip']);
 
     if (includeIps) {
-        logger.verbose('    => req.ips           - ' + requestDetails['ips']);
+        logger.verbose(    '    => req.ips           - ' + requestDetails['ips']);
     }
 
     if (optimizeFor === 'reading') {
-        logger.verbose('    => req.query         - ' + jsonStringifyAndAlign(requestDetails['query']));
+        logger.verbose(    '    => req.query         - ' + jsonStringifyAndAlign(requestDetails['query']));
     } else {
-        logger.verbose('    => req.query         - ' + requestDetails['queryAsString']);
+        logger.verbose(    '    => req.query         - ' + requestDetails['queryAsString']);
     }
 
     if (optimizeFor === 'reading') {
-        logger.verbose('    => req.headers       - ' + jsonStringifyAndAlign(requestDetails['headers']));
+        logger.verbose(    '    => req.headers       - ' + jsonStringifyAndAlign(requestDetails['headers']));
     } else {
-        logger.verbose('    => req.headers       - ' + requestDetails['headersAsString']);
+        logger.verbose(    '    => req.headers       - ' + requestDetails['headersAsString']);
     }
 
     if (includeCookies) {
@@ -136,9 +136,9 @@ const logInDetail = function (
     }
 
     if (optimizeFor === 'reading' || optimizeFor === 'balanced') {
-        logger.verbose('    => req.body          - ' + jsonStringifyAndAlign(requestDetails['body']));
+        logger.verbose(    '    => req.body          - ' + jsonStringifyAndAlign(requestDetails['body']));
     } else {
-        logger.verbose('    => req.body          - ' + requestDetails['bodyAsString']);
+        logger.verbose(    '    => req.body          - ' + requestDetails['bodyAsString']);
     }
 
     logger.verbose('>>>>');
