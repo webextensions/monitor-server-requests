@@ -96,7 +96,7 @@ const logInDetail = function (
     };
 
     logger.verbose('');
-    logger.verbose('>>>>');
+    logger.verbose('<<<<');
 
     logger.verbose('    => Time              - ' + requestDetails['localTime'] + ' (UTC: ' + requestDetails['utcTimestamp'] + ')');
     logger.info('    => Request URL       - ' + requestDetails['fullUrl']);
@@ -141,7 +141,7 @@ const logInDetail = function (
         logger.verbose('    => req.body          - ' + requestDetails['bodyAsString']);
     }
 
-    logger.verbose('<<<<');
+    logger.verbose('>>>>');
 
     return requestDetails;
 };
