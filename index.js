@@ -1,8 +1,11 @@
 /* eslint-disable filenames/no-index */
 
-const { logInDetail } = require('./logging/logInDetail.js');
+const {
+    logInDetail,
+    expressLogInDetail
+} = require('./logging/logInDetail.js');
 
 module.exports = {
     logInDetail,
-    monitorServerRequests: logInDetail
+    expressLogInDetail
 };

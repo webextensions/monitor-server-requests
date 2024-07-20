@@ -19,7 +19,7 @@ const libLocalIpAddressesAndHostnames = require('local-ip-addresses-and-hostname
 
 const { noteDown } = require('note-down');
 
-const { logInDetail } = require('./logging/logInDetail.js');
+const { expressLogInDetail } = require('./logging/logInDetail.js');
 
 const
     packageJson = require('./package.json'),
@@ -59,18 +59,12 @@ app.use(cookieParser());
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
-app.use((req, res, next) => {
-    logInDetail(
-        req,
-        {
-            includeCookies: true,
-            includeSignedCookies: true,
-            includeIps: true,
-            optimizeFor: options.optimizeFor
-        }
-    );
-    return next();
-});
+app.use(expressLogInDetail({
+    includeCookies: true,
+    includeSignedCookies: true,
+    includeIps: true,
+    optimizeFor: options.optimizeFor
+}));
 
 let delayMinFromConfig = parseInt(options.delayMin);
 if (0 <= delayMinFromConfig && delayMinFromConfig <= Number.MAX_SAFE_INTEGER) {

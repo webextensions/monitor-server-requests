@@ -1,6 +1,5 @@
 const { noteDown } = require('note-down');
 
-const logger = noteDown;
 noteDown.option('showLogLine', false);
 
 const getFullUrl = function (req) {
@@ -72,6 +71,7 @@ const getRequestDetails  = function (
 const logInDetail = function (
     req,
     {
+        logger = noteDown,
         includeCookies = false,
         includeSignedCookies = false,
         includeIps = false,
@@ -146,4 +146,31 @@ const logInDetail = function (
     return requestDetails;
 };
 
-module.exports = { logInDetail };
+const expressLogInDetail = function (
+    {
+        logger = noteDown,
+        includeCookies = false,
+        includeSignedCookies = false,
+        includeIps = false,
+        optimizeFor = 'balanced'
+    } = {}
+) {
+    return function (req, res, next) {
+        logInDetail(
+            req,
+            {
+                logger,
+                includeCookies,
+                includeSignedCookies,
+                includeIps,
+                optimizeFor
+            }
+        );
+        return next();
+    };
+};
+
+module.exports = {
+    logInDetail,
+    expressLogInDetail
+};
