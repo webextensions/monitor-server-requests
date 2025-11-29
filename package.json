@@ -60,5 +60,5 @@
         "start:port-dynamic": "nodemon ./cli.js -- --port-dynamic",
         "test": "npm run lint"
     },
-    "version": "0.4.3"
+    "version": "0.5.0"
 }
