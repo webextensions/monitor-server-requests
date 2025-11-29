@@ -1,5 +1,3 @@
-/* eslint-disable filenames/no-index */
-
 const {
     logInDetail,
     expressLogInDetail

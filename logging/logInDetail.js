@@ -17,7 +17,7 @@ const getRequestDetails  = function (
 ) {
     const requestDetails = {};
 
-    const localTime = (new Date(Date.now() - ((new Date()).getTimezoneOffset() * 60 * 1000))).toISOString().substr(11, 12);
+    const localTime = (new Date(Date.now() - ((new Date()).getTimezoneOffset() * 60 * 1000))).toISOString().slice(11, 23);
     requestDetails['localTime'] = localTime;
 
     const utcTimestamp = (new Date().toISOString()).replace('T', ' ').replace('Z', '');
@@ -92,8 +92,8 @@ const logInDetail = function (
 
     const jsonStringifyAndAlign = function (json) {
         try {
-            return JSON.stringify(json, null, 4).replace(/\n/g, '\n       ');
-        } catch (err) {
+            return JSON.stringify(json, null, 4).replaceAll('\n', '\n       ');
+        } catch (err) { // eslint-disable-line no-unused-vars
             return String(json);
         }
     };

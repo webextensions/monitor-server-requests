@@ -39,6 +39,7 @@ program
     .option('-d, --port-dynamic',        'Use dynamic port number ;',                                       false)
     .option('--disable-static',          'Do not serve static files ;',                                     false)
     .option('-s, --status <number>',     'Status code for unmatched requests (eg: 200, 404, 500, etc) ;',   404)
+    // eslint-disable-next-line unicorn/prefer-string-raw
     .option('-r, --response <content>',  'Response for unmatched requests (eg: "ok", "{\\"a\\":1}" etc) ;', null)
     .option('--delay-min <number>',      'Minimum delay in milliseconds ;',                                 0)
     .option('--delay-max <number>',      'Maximum delay in milliseconds ;',                                 0)
@@ -66,14 +67,14 @@ app.use(expressLogInDetail({
     optimizeFor: options.optimizeFor
 }));
 
-let delayMinFromConfig = parseInt(options.delayMin);
+let delayMinFromConfig = Number.parseInt(options.delayMin);
 if (0 <= delayMinFromConfig && delayMinFromConfig <= Number.MAX_SAFE_INTEGER) {
     // do nothing
 } else {
     delayMinFromConfig = DEFAULT_PORT;
 }
 
-let delayMaxFromConfig = parseInt(options.delayMax);
+let delayMaxFromConfig = Number.parseInt(options.delayMax);
 if (0 <= delayMaxFromConfig && delayMaxFromConfig <= Number.MAX_SAFE_INTEGER) {
     // do nothing
 } else {
@@ -82,7 +83,7 @@ if (0 <= delayMaxFromConfig && delayMaxFromConfig <= Number.MAX_SAFE_INTEGER) {
 
 app.use(networkDelay(delayMinFromConfig, delayMaxFromConfig));
 
-let abortRandomlyFromConfig = parseFloat(options.abortRandomly);
+let abortRandomlyFromConfig = Number.parseFloat(options.abortRandomly);
 if (0 <= abortRandomlyFromConfig && abortRandomlyFromConfig <= 1) {
     // do nothing
 } else {
@@ -120,7 +121,7 @@ if (options.disableStatic) {
 
 // Just a code block
 {
-    const statusCodeFromConfig = parseInt(options.status);
+    const statusCodeFromConfig = Number.parseInt(options.status);
 
     let statusCode;
     if (100 <= statusCodeFromConfig && statusCodeFromConfig <= 999) {
@@ -145,7 +146,7 @@ if (options.disableStatic) {
     });
 }
 
-let portFromConfig = parseInt(options.port);
+let portFromConfig = Number.parseInt(options.port);
 if (1 <= portFromConfig && portFromConfig <= 65535) {
     // do nothing
 } else {
@@ -170,8 +171,8 @@ if (1 <= portFromConfig && portFromConfig <= 65535) {
     if (isPortInUse) {
         logger.error(`Port ${portToUse} is already in use.`);
         logger.verbose(`In such cases, we recommend launching ${packageName} with ${chalk.bold('--port-dynamic')} parameter.`);
-        logger.verbose(`Exiting...`);
-        process.exit(1);
+        logger.verbose('Exiting...');
+        process.exit(1); // eslint-disable-line n/no-process-exit
     } else {
         logger.info('Starting server on port ' + portToUse);
     }
@@ -180,7 +181,7 @@ if (1 <= portFromConfig && portFromConfig <= 65535) {
         let localIpAddressesAndHostnames;
         try {
             localIpAddressesAndHostnames = libLocalIpAddressesAndHostnames.getLocalIpAddressesAndHostnames();
-        } catch (e) {
+        } catch (err) { // eslint-disable-line no-unused-vars
             localIpAddressesAndHostnames = [];
         }
 
@@ -193,9 +194,9 @@ if (1 <= portFromConfig && portFromConfig <= 65535) {
                 logger.info('This server can be accessed from any of the following paths:');
             }
 
-            localhostPaths.forEach(function (localhostPath) {
+            for (const localhostPath of localhostPaths) {
                 logger.verbose('\t' + 'http://' + localhostPath + ':' + portToUse + '/');
-            });
+            }
         }
 
         logger.info('Press Ctrl+C to stop the server');
@@ -211,17 +212,18 @@ const readlineInterface = readline.createInterface({
 readlineInterface.on('line', (input) => {
     switch (input.trim()) {
         case 'clear':
-        case 'cls':
+        case 'cls': {
             // Note: There is a `console.clear()` method as well, but, it doesn't seem to follow a predictable behavior
             // in some cases when tested in terminal. Haven't tested the behavior in debug mode and probably
             // `console.clear()` might work better inside Node.js/Chrome DevTools and we may want to use both the
             // approaches together.
             process.stdout.write('\u001Bc'); // Clear the terminal screen
             break;
+        }
     }
 });
 
 readlineInterface.on('SIGINT', () => {
     logger.error(`${packageName} stopped ... Exiting`);
-    process.exit(0);
+    process.exit(0); // eslint-disable-line n/no-process-exit
 });
